@@ -94,16 +94,16 @@ class NATTable:
 ### 🧑‍💻 Fran (Integrante 2): Motor ARP Dinámico
 **Archivos principales:** `arp_manager.py`, `tests/test_arp.py`
 
-- [ ] **Tabla ARP en memoria**: Estructura `arp_table = {IPAddr: (EthAddr, in_port)}`.
-- [ ] **Responder a consultas dirigidas al router (ARP Request)**:
+- [x] **Tabla ARP en memoria**: Estructura `arp_table = {IPAddr: (EthAddr, in_port)}`.
+- [x] **Responder a consultas dirigidas al router (ARP Request)**:
   - Si preguntan por la IP privada del router (`192.168.1.254`), responder con `PRIVATE_MAC`.
   - Si preguntan por la IP pública del router (`200.0.0.254`), responder con `PUBLIC_MAC`.
-- [ ] **Generar consultas del router (ARP Request)**:
+- [x] **Generar consultas del router (ARP Request)**:
   - Enviar broadcast `ff:ff:ff:ff:ff:ff` cuando el router necesita resolver una IP destino desconocida (ej. el servidor `h1`).
-- [ ] **Cola de paquetes pendientes (`pending_packets`)**:
+- [x] **Cola de paquetes pendientes (`pending_packets`)**:
   - Guardar paquetes que esperan resolución de MAC.
   - Al recibir el `ARP Reply`, registrar la MAC y despachar los paquetes encolados.
-- [ ] **Tests unitarios aislados**: Probar el aprendizaje y generación de paquetes ARP sin requerir Mininet activo.
+- [x] **Tests unitarios aislados**: Probar el aprendizaje y generación de paquetes ARP sin requerir Mininet activo.
 
 ---
 
