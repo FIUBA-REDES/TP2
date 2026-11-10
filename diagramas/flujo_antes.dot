@@ -1,0 +1,31 @@
+digraph FlujoAntes {
+    rankdir=TB;
+    node [shape=box, style="filled,rounded", fontname="Arial", fontsize=11, margin=0.2];
+    edge [fontname="Arial", fontsize=10];
+
+    Start [label="Switch recibe paquete\n(PacketIn en POX)", fillcolor="#e3f2fd", color="#1565c0", shape=ellipse];
+    Parsed [label="¿POX pudo decodificar\nla trama?", shape=diamond, fillcolor="#fff9c4", color="#fbc02d"];
+    DropParsed [label="DROP\n(Trama no reconocida)", fillcolor="#ffcdd2", color="#c62828"];
+
+    CheckL2 [label="¿Tipo de trama es IPv4?\n(dl_type == 0x0800)", shape=diamond, fillcolor="#fff9c4", color="#fbc02d"];
+    DropL2 [label="LOG: Ignorar paquete\n(Descarta ARP, IPv6, etc.)", fillcolor="#ffcdd2", color="#c62828"];
+
+    CheckPrivate [label="¿IP origen pertenece a\n192.168.1.0/24?", shape=diamond, fillcolor="#fff9c4", color="#fbc02d"];
+    DropPrivate [label="LOG: NO MATCH\n(Descarta tráfico entrante\no de otras redes)", fillcolor="#ffcdd2", color="#c62828"];
+
+    InstallOut [label="Instalar Flujo Saliente en Switch:\n• Match: nw_src, in_port\n• Acción: Reescribe solo MACs\n(src=PUBLIC_MAC, dst=H1_MAC hardcodeada)\n• Output(PUBLIC_PORT)", fillcolor="#c8e6c9", color="#2e7d32"];
+    InstallIn [label="Instalar Flujo Entrante en Switch:\n• Match: nw_src=dstip, nw_dst=srcip\n• Acción: Reescribe solo MACs\n(src=PRIVATE_MAC, dst=packet.src)\n• Output(in_port)", fillcolor="#c8e6c9", color="#2e7d32"];
+    PacketOut [label="PacketOut al Switch:\n• Reescribe MACs del paquete actual\n• Envía paquete por PUBLIC_PORT", fillcolor="#e1bee7", color="#6a1b9a"];
+    End [label="Fin de atención en Controlador", fillcolor="#cfd8dc", color="#455a64", shape=ellipse];
+
+    Start -> Parsed;
+    Parsed -> DropParsed [label="No"];
+    Parsed -> CheckL2 [label="Sí"];
+    CheckL2 -> DropL2 [label="No (e.g. ARP)"];
+    CheckL2 -> CheckPrivate [label="Sí"];
+    CheckPrivate -> DropPrivate [label="No"];
+    CheckPrivate -> InstallOut [label="Sí"];
+    InstallOut -> InstallIn;
+    InstallIn -> PacketOut;
+    PacketOut -> End;
+}
