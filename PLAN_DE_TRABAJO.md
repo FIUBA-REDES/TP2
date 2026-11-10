@@ -80,7 +80,7 @@ class NATTable:
 ### 🧑‍💻 Atu (Integrante 1): Topología y Automatización de Pruebas
 **Archivos principales:** `topo.py`, `tests/run_tests.sh`
 
-- [ ] **Extender topología**: Agregar hosts `h3` (`192.168.1.3/24`) y `h4` (`192.168.1.4/24`) conectados a `s1`.
+- [x] **Extender topología**: Agregar hosts `h3` (`192.168.1.3/24`) y `h4` (`192.168.1.4/24`) conectados a `s1`.
 - [ ] **Eliminar ARP estático**: Remover las llamadas a `setARP` de `topo.py`.
 - [ ] **Parametrización**: Permitir configurar IPs, MACs y subredes por parámetros o variables para evitar hardcodeos (exigencia de la demo).
 - [ ] **Scripts de prueba en Mininet**:
