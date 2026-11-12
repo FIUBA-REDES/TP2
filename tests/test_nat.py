@@ -71,6 +71,38 @@ class NATTableTest(unittest.TestCase):
         self.assertNotEqual(a, b)
         self.assertEqual(self.nat.get_inbound(ICMP, b), (H3, 7, 3))
 
+    def test_liberar(self):
+        port = self.nat.get_or_allocate_outbound(TCP, H2, 45000, H1, 80, in_port=2)
+        self.nat.release_port(TCP, port)
+        self.assertIsNone(self.nat.get_inbound(TCP, port))
+        self.assertEqual(self.nat.active_connections(), 0)
+
+    def test_liberar_dos_veces_no_falla(self):
+        port = self.nat.get_or_allocate_outbound(TCP, H2, 45000, H1, 80, in_port=2)
+        self.nat.release_port(TCP, port)
+        self.nat.release_port(TCP, port)
+        self.nat.release_port(TCP, 99999)
+
+    def test_liberar_no_duplica_puertos_en_el_pool(self):
+        nat = NATTable(start_port=10000, end_port=10000)
+        port = nat.get_or_allocate_outbound(TCP, H2, 45000, H1, 80, in_port=2)
+        nat.release_port(TCP, port)
+        nat.release_port(TCP, port)
+        nat.get_or_allocate_outbound(TCP, H2, 1, H1, 80, in_port=2)
+        self.assertIsNone(nat.get_or_allocate_outbound(TCP, H3, 1, H1, 80, in_port=3))
+
+    def test_misma_conexion_despues_de_liberar_recibe_puerto_nuevo(self):
+        port = self.nat.get_or_allocate_outbound(TCP, H2, 45000, H1, 80, in_port=2)
+        self.nat.release_port(TCP, port)
+        again = self.nat.get_or_allocate_outbound(TCP, H2, 45000, H1, 80, in_port=2)
+        self.assertEqual(self.nat.get_inbound(TCP, again), (H2, 45000, 2))
+
+    def test_puerto_liberado_se_reutiliza(self):
+        nat = NATTable(start_port=10000, end_port=10000)
+        port = nat.get_or_allocate_outbound(TCP, H2, 45000, H1, 80, in_port=2)
+        nat.release_port(TCP, port)
+        self.assertEqual(nat.get_or_allocate_outbound(TCP, H4, 50000, H1, 80, in_port=4), port)
+
 
 if __name__ == "__main__":
     unittest.main()

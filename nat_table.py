@@ -69,3 +69,16 @@ class NATTable:
     def active_connections(self) -> int:
         """Cantidad de conexiones con puerto asignado (util para logs)."""
         return len(self.inbound)
+
+    def release_port(self, proto: int, pub_port: int) -> None:
+        """
+        Libera el puerto publico cuando el flujo expira en el switch.
+        Si ya estaba liberado no hace nada.
+        """
+        entry = self.inbound.pop((proto, pub_port), None)
+        if entry is None:
+            return
+
+        priv_ip, priv_port, _, dst_ip, dst_port = entry
+        self.outbound.pop((proto, priv_ip, priv_port, dst_ip, dst_port), None)
+        self.free_ports.append(pub_port)
