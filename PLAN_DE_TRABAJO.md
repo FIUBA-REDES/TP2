@@ -124,17 +124,17 @@ class NATTable:
 ### 🧑‍💻 Valen (Integrante 4): Orquestador OpenFlow y Controlador Principal
 **Archivos principales:** `protorouter.py`
 
-- [ ] **Despacho en `_handle_PacketIn`**: Diferenciar `ARP_TYPE` (derivar a `ARPManager`) de `IP_TYPE`.
-- [ ] **Instalación de Flujos OpenFlow (`ofp_flow_mod`)**:
+- [x] **Despacho en `_handle_PacketIn`**: Diferenciar `ARP_TYPE` (derivar a `ARPManager`) de `IP_TYPE`.
+- [x] **Instalación de Flujos OpenFlow (`ofp_flow_mod`)**:
   - **Flujo Saliente**:
     - Match: `dl_type=0x800`, `nw_proto`, `in_port`, `nw_src`, `tp_src`, `nw_dst`, `tp_dst`.
     - Acciones: Set `nw_src=PUBLIC_IP`, Set `tp_src=port_pub`, Set `dl_src=PUBLIC_MAC`, Set `dl_dst=mac_destino`, `output(PUBLIC_PORT)`.
   - **Flujo Entrante**:
     - Match: `dl_type=0x800`, `nw_proto`, `in_port=PUBLIC_PORT`, `nw_src=dst_ip`, `tp_src=dst_port`, `nw_dst=PUBLIC_IP`, `tp_dst=port_pub`.
     - Acciones: Set `nw_dst=priv_ip`, Set `tp_dst=priv_port`, Set `dl_src=PRIVATE_MAC`, Set `dl_dst=mac_privada`, `output(in_port)`.
-- [ ] **Timeouts**: Configurar `idle_timeout` (ej. 15-30s) y flag `OFPFF_SEND_FLOW_REM`.
-- [ ] **Evento `_handle_FlowRemoved`**: Recibir la notificación del switch y avisar a `NATTable` para liberar el puerto público.
-- [ ] **Despacho del primer paquete (`ofp_packet_out`)**: Traducir y reenviar el paquete que generó el `PacketIn` para no perder el primer SYN.
+- [x] **Timeouts**: Configurar `idle_timeout` (ej. 15-30s) y flag `OFPFF_SEND_FLOW_REM`.
+- [x] **Evento `_handle_FlowRemoved`**: Recibir la notificación del switch y avisar a `NATTable` para liberar el puerto público.
+- [x] **Despacho del primer paquete (`ofp_packet_out`)**: Traducir y reenviar el paquete que generó el `PacketIn` para no perder el primer SYN.
 
 ---
 

@@ -1,2 +1,8 @@
 *.pyc
 __pycache__/
+pox/*
+!pox/ext/
+pox/ext/*
+!pox/ext/*.py
+!pox/ext/tests/
+!pox/ext/tests/*.py
