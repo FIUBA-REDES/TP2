@@ -54,6 +54,23 @@ class NATTableTest(unittest.TestCase):
         port = nat.get_or_allocate_outbound(TCP, H2, 1, H1, 80, in_port=2)
         self.assertEqual(nat.get_or_allocate_outbound(TCP, H2, 1, H1, 80, in_port=2), port)
 
+    def test_ida_y_vuelta(self):
+        port = self.nat.get_or_allocate_outbound(UDP, H3, 53000, H1, 5001, in_port=3)
+        self.assertEqual(self.nat.get_inbound(UDP, port), (H3, 53000, 3))
+
+    def test_puerto_desconocido_devuelve_none(self):
+        self.assertIsNone(self.nat.get_inbound(TCP, 12345))
+
+    def test_protocolo_distinto_no_matchea(self):
+        port = self.nat.get_or_allocate_outbound(TCP, H2, 45000, H1, 80, in_port=2)
+        self.assertIsNone(self.nat.get_inbound(UDP, port))
+
+    def test_icmp_con_identificador_como_puerto(self):
+        a = self.nat.get_or_allocate_outbound(ICMP, H2, 7, H1, 0, in_port=2)
+        b = self.nat.get_or_allocate_outbound(ICMP, H3, 7, H1, 0, in_port=3)
+        self.assertNotEqual(a, b)
+        self.assertEqual(self.nat.get_inbound(ICMP, b), (H3, 7, 3))
+
 
 if __name__ == "__main__":
     unittest.main()

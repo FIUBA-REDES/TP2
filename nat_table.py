@@ -55,6 +55,17 @@ class NATTable:
         self.inbound[(proto, pub_port)] = (priv_ip, priv_port, in_port, dst_ip, dst_port)
         return pub_port
 
+    def get_inbound(self, proto: int, pub_port: int):
+        """
+        Retorna (priv_ip, priv_port, in_port) o None si el puerto publico no
+        tiene una conexion activa.
+        """
+        entry = self.inbound.get((proto, pub_port))
+        if entry is None:
+            return None
+        priv_ip, priv_port, in_port, _, _ = entry
+        return priv_ip, priv_port, in_port
+
     def active_connections(self) -> int:
         """Cantidad de conexiones con puerto asignado (util para logs)."""
         return len(self.inbound)
