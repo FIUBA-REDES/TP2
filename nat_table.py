@@ -31,3 +31,30 @@ class NATTable:
         # Se guarda tambien el destino para poder reconstruir la clave
         # saliente al liberar.
         self.inbound = {}
+
+    def get_or_allocate_outbound(self, proto: int, priv_ip, priv_port: int,
+                                 dst_ip, dst_port: int, in_port: int = None):
+        """
+        Retorna el puerto publico de la conexion. Si es nueva, le asigna uno
+        libre. Retorna None si no quedan puertos libres.
+
+        in_port es el puerto del switch donde esta el host privado; se guarda
+        para que get_inbound pueda devolverlo.
+        """
+        key = (proto, priv_ip, priv_port, dst_ip, dst_port)
+
+        # Conexion ya conocida: siempre el mismo puerto
+        if key in self.outbound:
+            return self.outbound[key]
+
+        if not self.free_ports:
+            return None
+
+        pub_port = self.free_ports.popleft()
+        self.outbound[key] = pub_port
+        self.inbound[(proto, pub_port)] = (priv_ip, priv_port, in_port, dst_ip, dst_port)
+        return pub_port
+
+    def active_connections(self) -> int:
+        """Cantidad de conexiones con puerto asignado (util para logs)."""
+        return len(self.inbound)
