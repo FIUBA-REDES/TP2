@@ -110,14 +110,14 @@ class NATTable:
 ### 🧑‍💻 Elias (Integrante 3): Motor de Estado y Asignación de Puertos (PAT)
 **Archivos principales:** `nat_table.py`, `tests/test_nat.py`
 
-- [ ] **Pool de puertos públicos**: Rango configurable (por defecto `10000` a `65535`) gestionado con conjuntos/colas para O(1).
-- [ ] **Mapeos bidireccionales**:
+- [x] **Pool de puertos públicos**: Rango configurable (por defecto `10000` a `65535`) gestionado con conjuntos/colas para O(1).
+- [x] **Mapeos bidireccionales**:
   - Saliente: `(proto, ip_priv, port_priv, ip_dst, port_dst) -> port_pub`
   - Entrante: `(proto, port_pub) -> (ip_priv, port_priv, in_port)`
-- [ ] **Soporte de protocolos de transporte**: TCP (`0x06`) y UDP (`0x11`).
-- [ ] **Soporte ICMP**: Mapear identificador ICMP (`icmp.id`) como pseudo-puerto para permitir que múltiples hosts hagan `ping`.
-- [ ] **Reutilización y liberación**: Método `release_port()` que recicla el puerto al expirar el flujo.
-- [ ] **Tests unitarios**: Validar no colisión de puertos entre distintos hosts privados con el mismo puerto de origen hacia el mismo servidor.
+- [x] **Soporte de protocolos de transporte**: TCP (`0x06`) y UDP (`0x11`).
+- [x] **Soporte ICMP**: Mapear identificador ICMP (`icmp.id`) como pseudo-puerto para permitir que múltiples hosts hagan `ping`.
+- [x] **Reutilización y liberación**: Método `release_port()` que recicla el puerto al expirar el flujo.
+- [x] **Tests unitarios**: Validar no colisión de puertos entre distintos hosts privados con el mismo puerto de origen hacia el mismo servidor.
 
 ---
 
