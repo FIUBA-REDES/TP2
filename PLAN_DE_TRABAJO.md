@@ -81,12 +81,11 @@ class NATTable:
 **Archivos principales:** `topo.py`, `tests/run_tests.sh`
 
 - [x] **Extender topología**: Agregar hosts `h3` (`192.168.1.3/24`) y `h4` (`192.168.1.4/24`) conectados a `s1`.
-- [ ] **Eliminar ARP estático**: Remover las llamadas a `setARP` de `topo.py`.
-- [ ] **Parametrización**: Permitir configurar IPs, MACs y subredes por parámetros o variables para evitar hardcodeos (exigencia de la demo).
-- [ ] **Scripts de prueba en Mininet**:
-  - [ ] Test 1: Conectividad ICMP (`ping` individual y concurrente).
-  - [ ] Test 2: Concurrencia TCP (servidor HTTP en `h1`, descargas simultáneas desde `h2`, `h3` y `h4`).
-  - [ ] Test 3: Tráfico UDP bidireccional con `iperf`.
+- [x] **Eliminar ARP estático**: Remover las llamadas a `setARP` de `topo.py`.
+- [x] **Scripts de prueba en Mininet**:
+  - [x] Test 1: Conectividad ICMP (`ping` individual y concurrente).
+  - [x] Test 2: Concurrencia TCP (servidor HTTP en `h1`, descargas simultáneas desde `h2`, `h3` y `h4`).
+  - [x] Test 3: Tráfico UDP bidireccional con `iperf`.
 - [ ] **Validación con Wireshark / Tcpdump**: Exportar archivos `.pcap` en interfaces `s1-eth1` y `s1-eth2` verificando la traducción de IPs y puertos.
 
 ---
