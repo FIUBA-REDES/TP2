@@ -27,12 +27,11 @@ def log_color(color, msg):
 PRIVATE_SUBNET = IPAddr("192.168.1.0")      # Red interna
 PRIVATE_MASK = 24                           # Máscara de la red interna
 PRIVATE_IP = IPAddr("192.168.1.254")        # IP del router en la red privada
-PUBLIC_IP = IPAddr("200.0.0.254")           # IP del router en la red pública
-PUBLIC_MAC = EthAddr("00:00:00:aa:aa:aa")   # MAC del router hacia la red pública
-PRIVATE_MAC = EthAddr("00:00:00:bb:bb:bb")  # MAC del router hacia la red privada
+PUBLIC_IP = IPAddr("200.0.0.1")             # IP del router en la red pública
+PUBLIC_MAC = EthAddr("02:00:00:aa:aa:aa")   # MAC del router hacia la red pública
+PRIVATE_MAC = EthAddr("20:00:00:bb:bb:bb")  # MAC del router hacia la red privada
 PUBLIC_PORT = 1                             # Puerto del switch conectado a la red pública
 
-H1_MAC = EthAddr("00:00:00:00:00:01")       # MAC del host externo (TODO: resolver mediante ARP)
 
 # Para el NAT/PAT
 PUBLIC_SUBNET = IPAddr("200.0.0.0")         # Red publica
