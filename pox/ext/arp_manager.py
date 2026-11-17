@@ -1,7 +1,18 @@
+import time
+
 import pox.openflow.libopenflow_01 as of
 from pox.lib.addresses import EthAddr, IPAddr
 from pox.lib.packet.arp import arp
 from pox.lib.packet.ethernet import ETHER_ANY, ETHER_BROADCAST, ethernet
+
+# Segundos que una entrada aprendida se considera valida. Es mayor que el idle_timeout
+# de los flujos (30 s), asi una conexion que se reabre enseguida no vuelve a pedir ARP,
+# y es lo bastante corto para reaprender una MAC que cambio. Las conexiones ya
+# establecidas no dependen de esta tabla: sus MACs quedan escritas en los flujos.
+ARP_TIMEOUT = 60
+# Segundos que se espera un ARP Reply. Pasado ese tiempo los paquetes encolados se
+# descartan y el proximo paquete hacia ese destino envia un Request nuevo.
+ARP_PENDING_TIMEOUT = 5
 
 
 class ARPManager:
@@ -10,6 +21,8 @@ class ARPManager:
         self.router_config = router_config
         self.arp_table = {}
         self.pending_packets = {}
+        self.learned_at = {}       # ip -> momento en que se aprendio su MAC
+        self.pending_since = {}    # (ip, puerto) -> momento en que se envio el Request
 
     def handle_arp(self, event) -> None:
         """Procesa un paquete ARP entrante (Request o Reply)."""
@@ -23,10 +36,12 @@ class ARPManager:
 
         if arp_packet.protosrc != IPAddr("0.0.0.0"):
             self.arp_table[arp_packet.protosrc] = (arp_packet.hwsrc, event.port)
+            self.learned_at[arp_packet.protosrc] = time.time()
 
         if arp_packet.opcode == arp.REPLY:
             pending_key = (arp_packet.protosrc, event.port)
             callbacks = self.pending_packets.pop(pending_key, [])
+            self.pending_since.pop(pending_key, None)
             for callback in callbacks:
                 callback()
             return
@@ -62,8 +77,14 @@ class ARPManager:
         self.connection.send(packet_out)
 
     def get_mac(self, ip: IPAddr) -> EthAddr | None:
-        """Devuelve la MAC si ya fue aprendida, o None si no se conoce."""
-        entry = self.arp_table.get(IPAddr(ip))
+        """Devuelve la MAC si fue aprendida hace menos de ARP_TIMEOUT, o None si no se conoce."""
+        ip = IPAddr(ip)
+        learned_at = self.learned_at.get(ip)
+        if learned_at is not None and time.time() - learned_at > ARP_TIMEOUT:
+            del self.arp_table[ip]
+            del self.learned_at[ip]
+            return None
+        entry = self.arp_table.get(ip)
         return entry[0] if entry is not None else None
 
     def resolve_or_queue(self, target_ip: IPAddr, out_port: int, packet_out_callback) -> bool:
@@ -77,10 +98,17 @@ class ARPManager:
             return True
 
         pending_key = (target_ip, out_port)
+        sent_at = self.pending_since.get(pending_key)
+        if sent_at is not None and time.time() - sent_at > ARP_PENDING_TIMEOUT:
+            # El Reply nunca llego: se descartan los paquetes viejos para no bloquear el destino
+            del self.pending_packets[pending_key]
+            del self.pending_since[pending_key]
+
         callbacks = self.pending_packets.setdefault(pending_key, [])
         callbacks.append(packet_out_callback)
         if len(callbacks) > 1:
             return False
+        self.pending_since[pending_key] = time.time()
 
         if out_port == self.router_config["public_port"]:
             src_ip = self.router_config["public_ip"]
